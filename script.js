@@ -1284,55 +1284,292 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ==========================================================================
-  // SECTION P: ADMIN USERS TABLE (admin-users.html -> php/admin-get-users.php)
+  // SECTION P: ADMIN USERS MANAGEMENT (admin-users.html -> php/admin-get-users.php)
   // ==========================================================================
   const adminUsersTbody = document.getElementById('admin-users-tbody');
   if (adminUsersTbody) {
     const titleEl = document.getElementById('admin-users-panel-title');
     const subtextEl = document.getElementById('admin-users-subtext');
+    const searchInput = document.getElementById('admin-users-search');
+    const roleFilter = document.getElementById('admin-users-role-filter');
+    const statusFilter = document.getElementById('admin-users-status-filter');
 
-    fetch('php/admin-get-users.php')
+    const btnOpenAddUser = document.getElementById('btn-open-add-user');
+    const userModal = document.getElementById('user-modal');
+    const userModalTitle = document.getElementById('user-modal-title');
+    const userModalForm = document.getElementById('user-modal-form');
+    const btnCloseModal = document.getElementById('btn-close-user-modal');
+    const btnCancelModal = document.getElementById('btn-cancel-user-modal');
+
+    const modalUserId = document.getElementById('modal-user-id');
+    const modalUserName = document.getElementById('modal-user-name');
+    const modalUserEmail = document.getElementById('modal-user-email');
+    const modalUserPassword = document.getElementById('modal-user-password');
+    const modalUserRole = document.getElementById('modal-user-role');
+    const modalUserStatus = document.getElementById('modal-user-status');
+    const modalPasswordHint = document.getElementById('modal-password-hint');
+
+    let allUsers = [];
+
+    function fetchAndLoadUsers() {
+      fetch('php/admin-get-users.php')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.users)) {
+            allUsers = data.users;
+            renderAdminUsers();
+          } else {
+            allUsers = [];
+            if (titleEl) titleEl.textContent = `Registered Users (0 Total)`;
+            if (subtextEl) subtextEl.textContent = `0 registered users`;
+            adminUsersTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem;">${data.message || 'Access denied.'}</td></tr>`;
+          }
+        })
+        .catch(err => {
+          adminUsersTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem;">Failed to load user directory from server.</td></tr>`;
+        });
+    }
+
+    function renderAdminUsers() {
+      const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const r = roleFilter ? roleFilter.value.toUpperCase() : '';
+      const s = statusFilter ? statusFilter.value.toUpperCase() : '';
+
+      const filtered = allUsers.filter(u => {
+        const matchesQuery = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || String(u.id).includes(q);
+        const matchesRole = !r || (u.role && u.role.toUpperCase() === r);
+        const matchesStatus = !s || ((u.status ? u.status.toUpperCase() : 'ACTIVE') === s);
+        return matchesQuery && matchesRole && matchesStatus;
+      });
+
+      if (titleEl) titleEl.textContent = `Registered Users (${filtered.length} of ${allUsers.length})`;
+      if (subtextEl) subtextEl.textContent = `Displaying ${filtered.length} matching user records`;
+
+      adminUsersTbody.innerHTML = '';
+      if (filtered.length === 0) {
+        adminUsersTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem;">No user accounts match the selected criteria.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(u => {
+        const uStatus = (u.status ? u.status.toUpperCase() : 'ACTIVE');
+        const isActive = (uStatus === 'ACTIVE');
+        const isCurrentAdmin = (currentUser && Number(currentUser.id) === Number(u.id));
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="tabular-num"><strong>#USR-${u.id}</strong></td>
+          <td>
+            <div style="font-weight: 700; color: var(--text-dark);">${u.name}</div>
+            <div class="text-muted" style="font-size: 0.8rem;">${u.role === 'ADMIN' ? 'Administrator' : 'Student'}</div>
+          </td>
+          <td>${u.email}</td>
+          <td><span class="badge ${u.role === 'ADMIN' ? 'badge-found' : 'badge-role'}">${u.role}</span></td>
+          <td class="tabular-num">${u.created_at || 'Registered'}</td>
+          <td>
+            <span class="badge ${isActive ? 'badge-found' : 'badge-lost'}">${uStatus}</span>
+          </td>
+          <td>
+            <div class="table-action-group">
+              <button type="button" class="btn btn-outline btn-sm btn-edit-user" data-id="${u.id}">Edit</button>
+              <button type="button" class="btn ${isActive ? 'btn-secondary' : 'btn-primary'} btn-sm btn-toggle-status" data-id="${u.id}" data-status="${isActive ? 'INACTIVE' : 'ACTIVE'}" ${isCurrentAdmin && isActive ? 'disabled title="You cannot deactivate your own account"' : ''}>
+                ${isActive ? 'Deactivate' : 'Activate'}
+              </button>
+              <button type="button" class="btn btn-danger btn-sm btn-delete-user" data-id="${u.id}" ${isCurrentAdmin ? 'disabled title="You cannot delete your own account"' : ''}>Delete</button>
+            </div>
+          </td>
+        `;
+        adminUsersTbody.appendChild(tr);
+      });
+
+      // Attach button event listeners
+      const editBtns = adminUsersTbody.querySelectorAll('.btn-edit-user');
+      editBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = Number(this.getAttribute('data-id'));
+          const target = allUsers.find(x => Number(x.id) === userId);
+          if (target) openEditUserModal(target);
+        });
+      });
+
+      const toggleBtns = adminUsersTbody.querySelectorAll('.btn-toggle-status');
+      toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = Number(this.getAttribute('data-id'));
+          const targetStatus = this.getAttribute('data-status');
+          handleToggleStatus(userId, targetStatus);
+        });
+      });
+
+      const deleteBtns = adminUsersTbody.querySelectorAll('.btn-delete-user');
+      deleteBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = Number(this.getAttribute('data-id'));
+          handleDeleteUser(userId);
+        });
+      });
+    }
+
+    // Modal Control Functions
+    function openAddUserModal() {
+      if (userModalTitle) userModalTitle.textContent = 'Add Campus User';
+      if (modalUserId) modalUserId.value = '';
+      if (userModalForm) userModalForm.reset();
+      if (modalUserRole) modalUserRole.value = 'STUDENT';
+      if (modalUserStatus) modalUserStatus.value = 'ACTIVE';
+      if (modalUserPassword) {
+        modalUserPassword.required = true;
+        modalUserPassword.placeholder = '••••••••••••';
+      }
+      if (modalPasswordHint) modalPasswordHint.textContent = '(Min. 8 characters)';
+      if (userModal) userModal.classList.add('show');
+    }
+
+    function openEditUserModal(user) {
+      if (userModalTitle) userModalTitle.textContent = `Edit User Account (#USR-${user.id})`;
+      if (modalUserId) modalUserId.value = user.id;
+      if (modalUserName) modalUserName.value = user.name;
+      if (modalUserEmail) modalUserEmail.value = user.email;
+      if (modalUserRole) modalUserRole.value = user.role || 'STUDENT';
+      if (modalUserStatus) modalUserStatus.value = (user.status ? user.status.toUpperCase() : 'ACTIVE');
+      if (modalUserPassword) {
+        modalUserPassword.required = false;
+        modalUserPassword.value = '';
+        modalUserPassword.placeholder = 'Leave blank to keep current';
+      }
+      if (modalPasswordHint) modalPasswordHint.textContent = '(Optional: Enter new password to change)';
+      if (userModal) userModal.classList.add('show');
+    }
+
+    function closeUserModal() {
+      if (userModal) userModal.classList.remove('show');
+    }
+
+    // Open Add User
+    if (btnOpenAddUser) btnOpenAddUser.addEventListener('click', openAddUserModal);
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closeUserModal);
+    if (btnCancelModal) btnCancelModal.addEventListener('click', closeUserModal);
+    if (userModal) {
+      userModal.addEventListener('click', function (e) {
+        if (e.target === userModal) closeUserModal();
+      });
+    }
+
+    // Modal Form Submit (Add or Edit)
+    if (userModalForm) {
+      userModalForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const userId = modalUserId ? modalUserId.value.trim() : '';
+        const nameVal = modalUserName ? modalUserName.value.trim() : '';
+        const emailVal = modalUserEmail ? modalUserEmail.value.trim() : '';
+        const passVal = modalUserPassword ? modalUserPassword.value : '';
+        const roleVal = modalUserRole ? modalUserRole.value : 'STUDENT';
+        const statusVal = modalUserStatus ? modalUserStatus.value : 'ACTIVE';
+
+        if (!nameVal) {
+          alert('Full Name is required.');
+          return;
+        }
+        if (!emailVal || !isValidEmail(emailVal)) {
+          alert('Please enter a valid email address.');
+          return;
+        }
+
+        const isEditing = Boolean(userId);
+        if (!isEditing && (!passVal || passVal.length < 8)) {
+          alert('Password must be at least 8 characters long.');
+          return;
+        }
+        if (isEditing && passVal && passVal.length < 8) {
+          alert('New password must be at least 8 characters long.');
+          return;
+        }
+
+        const endpoint = isEditing ? 'php/admin-edit-user.php' : 'php/admin-add-user.php';
+        const payload = {
+          name: nameVal,
+          email: emailVal,
+          role: roleVal,
+          status: statusVal
+        };
+        if (isEditing) payload.id = Number(userId);
+        if (passVal) payload.password = passVal;
+
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showToast('✓ ' + data.message);
+            closeUserModal();
+            fetchAndLoadUsers();
+          } else {
+            alert('⚠ ' + data.message);
+          }
+        })
+        .catch(err => {
+          alert('⚠ Network error while saving user account.');
+        });
+      });
+    }
+
+    // Toggle Status
+    function handleToggleStatus(userId, targetStatus) {
+      const actionText = targetStatus === 'INACTIVE' ? 'deactivate' : 'activate';
+      if (!confirm(`Are you sure you want to ${actionText} this user account?`)) return;
+
+      fetch('php/admin-update-user-status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId, status: targetStatus })
+      })
       .then(res => res.json())
       .then(data => {
-        if (data.success && Array.isArray(data.users)) {
-          const users = data.users;
-          if (titleEl) titleEl.textContent = `Registered Users (${users.length} Total)`;
-          if (subtextEl) subtextEl.textContent = `Displaying ${users.length} user records`;
-
-          adminUsersTbody.innerHTML = '';
-          if (users.length === 0) {
-            adminUsersTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem;">No registered user accounts found in MySQL.</td></tr>`;
-          } else {
-            users.forEach(u => {
-              const tr = document.createElement('tr');
-              tr.innerHTML = `
-                <td class="tabular-num"><strong>#USR-${u.id}</strong></td>
-                <td>
-                  <div style="font-weight: 600;">${u.name}</div>
-                  <div class="text-muted" style="font-size: 0.8rem;">Campus User</div>
-                </td>
-                <td>${u.email}</td>
-                <td><span class="badge ${u.role === 'ADMIN' ? 'badge-found' : 'badge-role'}">${u.role}</span></td>
-                <td class="tabular-num">${u.created_at || 'Registered'}</td>
-                <td><span class="badge badge-active">Active</span></td>
-                <td>
-                  <div class="table-action-group">
-                    <button type="button" class="btn btn-outline btn-sm" disabled>Active</button>
-                  </div>
-                </td>
-              `;
-              adminUsersTbody.appendChild(tr);
-            });
-          }
+        if (data.success) {
+          showToast('✓ ' + data.message);
+          fetchAndLoadUsers();
         } else {
-          if (titleEl) titleEl.textContent = `Registered Users (0 Total)`;
-          if (subtextEl) subtextEl.textContent = `0 registered users`;
-          adminUsersTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem;">${data.message || 'Access denied.'}</td></tr>`;
+          alert('⚠ ' + data.message);
         }
       })
       .catch(err => {
-        if (adminUsersTbody) adminUsersTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem;">Failed to load user directory from server.</td></tr>`;
+        alert('⚠ Network error while updating user status.');
       });
+    }
+
+    // Delete User
+    function handleDeleteUser(userId) {
+      if (!confirm('Are you sure you want to PERMANENTLY delete this user account? This action cannot be undone.')) return;
+
+      fetch('php/admin-delete-user.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showToast('✓ ' + data.message);
+          fetchAndLoadUsers();
+        } else {
+          alert('⚠ ' + data.message);
+        }
+      })
+      .catch(err => {
+        alert('⚠ Network error while deleting user account.');
+      });
+    }
+
+    // Search and Filter Listeners
+    if (searchInput) searchInput.addEventListener('input', renderAdminUsers);
+    if (roleFilter) roleFilter.addEventListener('change', renderAdminUsers);
+    if (statusFilter) statusFilter.addEventListener('change', renderAdminUsers);
+
+    // Initial Load
+    fetchAndLoadUsers();
   }
 
 });

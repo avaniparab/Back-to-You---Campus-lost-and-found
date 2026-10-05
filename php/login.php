@@ -36,13 +36,19 @@ if (empty($password)) {
 
 try {
     // 2. Fetch User Record
-    $stmt = $pdo->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT id, name, email, password, role, status FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
     // 3. Password Verification (Generic error message for security)
     if (!$user || !password_verify($password, $user['password'])) {
         echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
+        exit;
+    }
+
+    // 4. Account Status Verification
+    if (isset($user['status']) && strtoupper($user['status']) === 'INACTIVE') {
+        echo json_encode(['success' => false, 'message' => 'Your account has been deactivated. Please contact the administrator.']);
         exit;
     }
 

@@ -22,7 +22,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
 }
 
 try {
-    $stmt = $pdo->query("SELECT id, name, email, role, created_at FROM users ORDER BY id DESC");
+    $stmt = $pdo->query("SELECT id, name, email, role, status, created_at FROM users ORDER BY id DESC");
     $users = $stmt->fetchAll();
 
     echo json_encode([

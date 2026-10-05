@@ -22,16 +22,25 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
 }
 
 try {
-    $totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-    $totalItems = (int)$pdo->query("SELECT COUNT(*) FROM items")->fetchColumn();
-    $totalLost  = (int)$pdo->query("SELECT COUNT(*) FROM items WHERE type = 'LOST'")->fetchColumn();
-    $totalFound = (int)$pdo->query("SELECT COUNT(*) FROM items WHERE type = 'FOUND'")->fetchColumn();
-    $totalResolved = (int)$pdo->query("SELECT COUNT(*) FROM items WHERE status = 'RESOLVED'")->fetchColumn();
+    $totalUsers     = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    $activeUsers    = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status = 'ACTIVE'")->fetchColumn();
+    $inactiveUsers  = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status = 'INACTIVE'")->fetchColumn();
+    $studentsCount  = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role = 'STUDENT'")->fetchColumn();
+    $adminsCount    = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role = 'ADMIN'")->fetchColumn();
+    
+    $totalItems     = (int)$pdo->query("SELECT COUNT(*) FROM items")->fetchColumn();
+    $totalLost      = (int)$pdo->query("SELECT COUNT(*) FROM items WHERE type = 'LOST'")->fetchColumn();
+    $totalFound     = (int)$pdo->query("SELECT COUNT(*) FROM items WHERE type = 'FOUND'")->fetchColumn();
+    $totalResolved  = (int)$pdo->query("SELECT COUNT(*) FROM items WHERE status = 'RESOLVED'")->fetchColumn();
 
     echo json_encode([
         'success' => true,
         'stats'   => [
             'total_users'    => $totalUsers,
+            'active_users'   => $activeUsers,
+            'inactive_users' => $inactiveUsers,
+            'students_count' => $studentsCount,
+            'admins_count'   => $adminsCount,
             'total_items'    => $totalItems,
             'total_lost'     => $totalLost,
             'total_found'    => $totalFound,
