@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (welcomeHeading) welcomeHeading.textContent = `Welcome back, ${currentUser.name}!`;
 
         const userMeta = document.getElementById('dashboard-user-meta');
-        if (userMeta) userMeta.innerHTML = `Student Account &middot; Campus Mail: <strong>${currentUser.email}</strong>`;
+        if (userMeta) userMeta.innerHTML = `${currentUser.role === 'ADMIN' ? 'Administrator Account' : 'Student Account'} &middot; Campus Mail: <strong>${currentUser.email}</strong>`;
 
         // Update Public Header navbar login button
         const navLoginLinks = document.querySelectorAll('.nav-links a[href="login.html"]');
