@@ -4,7 +4,7 @@
 
 **Back to You** is a campus-focused Lost & Found Management System that enables students to report misplaced or recovered personal belongings, search and filter listings across campus landmarks, track personal submissions, and reconnect lost items with their owners. Administrators can monitor real-time platform statistics, manage student listings, and oversee user accounts through a protected administrative portal.
 
-Originally prototyped as a monolithic PHP application, the project has completed a full architectural migration to a modern, decoupled **Java 21** and **Spring Boot 3.4.3** backend. The legacy PHP scripts and Apache/XAMPP dependencies have been completely retired.
+The application is engineered with a modern, decoupled full-stack architecture powered by **Java 21** and **Spring Boot 3.4.3**, cleanly separating the client-side presentation layer from the server-side API and persistence services.
 
 ---
 
@@ -299,7 +299,7 @@ Once started, open your browser and navigate to:
 http://localhost:8081/
 ```
 
-Spring Boot dynamically serves the frontend from `frontend/` on port `8081` while concurrently exposing the REST API at `http://localhost:8081/api/...`. No separate frontend server, Node.js process, or Apache web server is required.
+Spring Boot dynamically serves the frontend from `frontend/` on port `8081` while concurrently exposing the REST API at `http://localhost:8081/api/...`. No separate frontend server, Node.js process, or external web server is required.
 
 ---
 
