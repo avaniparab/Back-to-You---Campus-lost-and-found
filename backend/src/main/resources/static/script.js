@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ==========================================================================
   // Global Session Check & Authentication Protection
   // ==========================================================================
-  const API_BASE = 'http://localhost:8081';
+  const API_BASE = '';
   let currentUser = null;
 
   fetch(`${API_BASE}/api/auth/session-check`, {

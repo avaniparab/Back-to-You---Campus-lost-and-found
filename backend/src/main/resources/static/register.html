@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — Back to You</title>
+  <meta name="description" content="Create a new Back to You student account for lost and found reporting.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar" aria-label="Main Navigation">
+        <a href="index.html" class="brand">
+          <div class="brand-icon" aria-hidden="true">↺</div>
+          <div class="brand-text">
+            <span class="brand-title">BACK TO YOU</span>
+            <span class="brand-subtitle">Campus Lost &amp; Found</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="items.html" class="nav-link">Browse Items</a></li>
+          <li><a href="index.html#about" class="nav-link">About</a></li>
+          <li><a href="login.html" class="nav-link">Login</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-secondary btn-sm">Already a member? Login</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Register Main Content -->
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Create Student Account</h1>
+        <p>Register with your university student identity</p>
+      </div>
+
+      <form action="dashboard.html" method="get">
+        <div class="form-group">
+          <label for="reg-name" class="form-label">Full Name</label>
+          <input 
+            type="text" 
+            id="reg-name" 
+            name="fullname" 
+            class="form-control" 
+            placeholder="e.g. Avani Parab" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="reg-email" class="form-label">College Email Address</label>
+          <input 
+            type="email" 
+            id="reg-email" 
+            name="email" 
+            class="form-control" 
+            placeholder="e.g. avani.parab@viva-technology.org" 
+            required
+          >
+          <div class="form-help">Must end with @viva-technology.org to verify your student status.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            id="reg-password" 
+            name="password" 
+            class="form-control" 
+            placeholder="At least 8 characters" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="reg-confirm-password" class="form-label">Confirm Password</label>
+          <input 
+            type="password" 
+            id="reg-confirm-password" 
+            name="confirm_password" 
+            class="form-control" 
+            placeholder="Re-type your password" 
+            required
+          >
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 0.75rem;">
+          <input type="checkbox" id="terms-agree" name="terms" checked style="margin-top: 0.25rem; accent-color: var(--primary); cursor: pointer;" required>
+          <label for="terms-agree" style="font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">
+            I agree to the campus community guidelines and honor code for lost &amp; found property returns.
+          </label>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-accent btn-full btn-lg">Create Account</button>
+        </div>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html" style="font-weight: 600;">Sign in here</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" style="padding: 2rem 0; margin-top: auto;">
+    <div class="container text-center" style="font-size: 0.85rem; color: #8EABB4;">
+      &copy; 2026 Back to You — Campus Lost &amp; Found System. <a href="index.html" style="color: #C0D6DC; margin-left: 0.5rem;">Back to Home</a>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
