@@ -395,7 +395,7 @@ The frontend implements a modern **Glassmorphism** aesthetic built with vanilla 
 
 This project was developed as an academic web application to demonstrate full-stack engineering principles, including database schema design, RESTful API architecture, role-based access control, session management, and micro-service packaging.
 
-- **Author:** Avani Parab
+- **Author:** Avani Parab, Kritesh Maurya, Sara Mahajan, Harshit Mahyavanshi
 - **Institution:** Viva Institute of Technology
-- **Academic Project:** Web Designing / Full-Stack Development
+- **Academic Project:** Web Designing / Full-Stack Java Programming
 - **License:** Educational / Academic Use
