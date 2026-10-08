@@ -2,68 +2,53 @@
 
 > *Lost something? Let's get it back to you.*
 
-Back to You is a campus-focused Lost & Found Management System that allows students to report lost or found items, browse reported items, search and filter listings, manage their own reports, and reconnect lost belongings with their owners. Administrators can manage users and reported items through a protected admin dashboard.
+**Back to You** is a campus-focused Lost & Found Management System that enables students to report misplaced or recovered personal belongings, search and filter listings across campus landmarks, track personal submissions, and reconnect lost items with their owners. Administrators can monitor real-time platform statistics, manage student listings, and oversee user accounts through a protected administrative portal.
+
+Originally prototyped as a monolithic PHP application, the project has completed a full architectural migration to a modern, decoupled **Java 21** and **Spring Boot 3.4.3** backend. The legacy PHP scripts and Apache/XAMPP dependencies have been completely retired.
 
 ---
 
-## Features
+## Technical Summary
 
-### Student Features
-- **Student Registration:** Quick account creation with validation.
-- **College Email Validation:** Enforces campus domain verification using `@viva-technology.org`.
-- **Authentication:** Secure student login and session management/logout.
-- **Report a Lost Item:** Submit lost item details including category, location, date, description, and optional photo preview.
-- **Report a Found Item:** Register items found around campus to help reunite them with owners.
-- **Browse Reported Items:** Dynamic catalog rendering lost and found items.
-- **Search & Filter:** Filter listings by type (Lost/Found), category, location, or keyword search.
-- **Item Details View:** Dedicated detail page for each item (`item-details.html?id=X`).
-- **Contact Reporter:** Direct email action to contact the item reporter.
-- **My Reports Dashboard:** View personal submissions with real-time status updates.
-- **Mark Resolved:** Toggle item status from Active to Resolved once returned.
-- **Delete Own Reports:** Remove personal reports from the system.
-- **Responsive Interface:** Modern, mobile-friendly design across devices.
-
-### Admin Features
-- **Secure Admin Login:** Protected authentication for administrative accounts.
-- **Role-Based Authorization:** Server-enforced permissions (`ADMIN` vs `STUDENT`).
-- **Admin Dashboard:** Real-time system-wide statistics and metric cards.
-- **System Statistics:** Dynamic counts for total users, total items, lost items, found items, and resolved cases.
-- **Manage Users:** View registered user directory without exposing password hashes.
-- **Manage Reported Items:** Admin overview of all campus listings.
-- **Moderation Actions:** Ability to resolve or delete inappropriate/unnecessary listings.
-- **Protected Admin Pages:** Access control denying unauthorized student access to admin endpoints (`HTTP 403 Forbidden`).
-
----
-
-## How It Works
-
-### Student Workflow
-```
-Register (@viva-technology.org) → Login → Report / Browse Items → View Details → Contact Reporter → Mark Resolved
-```
-
-### Admin Workflow
-```
-Login (Admin Credentials) → Protected Admin Dashboard → View Metrics → Manage Users & Items → Logout
-```
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | HTML5, CSS3, Vanilla JavaScript (ES6+) | Glassmorphism design system, responsive layouts, dynamic Fetch API client |
+| **Backend** | Java 21, Spring Boot 3.4.3 | RESTful micro-architecture, Servlet-based Spring MVC controllers |
+| **Web Layer** | Spring Web MVC | Dynamic resource routing and view forwarding (`WebConfig`) |
+| **Persistence / ORM** | Spring Data JPA, Hibernate ORM | Relational entity mappings, automated schema validation |
+| **Database** | MySQL (Database: `back_to_you`) | Relational persistence with foreign-key constraints and indexes |
+| **Security & Auth** | Spring Security 6 | BCrypt password hashing, session-based authentication (`JSESSIONID`) |
+| **Build Tool** | Maven Wrapper (`./mvnw`) | Dependency management and build lifecycle automation |
+| **Development Server** | Embedded Apache Tomcat | Self-hosted Spring Boot server on port `8081` |
+| **Deployment Target** | Apache Tomcat | Web Application Archive (WAR) package deployment |
+| **Architecture** | Decoupled Client-Server | Separated `frontend/` and `backend/` directories |
 
 ---
 
 ## System Architecture
 
+### Development Architecture
+
 ```text
 Browser (Client)
-   ↓
-HTML5 + CSS3 + Vanilla JavaScript
-   ↓  (JSON / HTTP Fetch API)
-PHP Backend (8.5) + Sessions
-   ↓  (PDO Prepared Statements)
-MySQL Database (back_to_you)
+   │
+   │  HTTP / REST (Port 8081)
+   ▼
+Spring Boot Application
+   ├── WebMvcConfigurer (WebConfig)
+   │     └── Static Resource Handler ──► frontend/ (*.html, *.css, *.js)
+   │
+   └── Spring MVC REST Controllers (/api/**)
+         │
+         ▼
+      Service Layer (AuthService, ItemService, AdminService)
+         │
+         ▼
+      Spring Data JPA Repositories (UserRepository, ItemRepository)
+         │  (Hibernate ORM)
+         ▼
+      MySQL Database (back_to_you)
 ```
-
-- **Frontend (HTML5, CSS3, Vanilla JS):** Renders the user interface, handles form validations, communicates asynchronously with PHP backend endpoints, and dynamically updates the DOM without page reloads.
-- **Backend (PHP 8.5):** Processes requests, validates input server-side, manages user session state (`$_SESSION`), enforces role-based access control, and interfaces with MySQL.
-- **Database (MySQL):** Persistent storage layer maintaining relational tables for `users` and `items`.
 
 ---
 
@@ -71,265 +56,346 @@ MySQL Database (back_to_you)
 
 ```text
 Back-to-You/
+├── backend/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/backtoyou/
+│   │   │   │   ├── config/
+│   │   │   │   │   └── WebConfig.java
+│   │   │   │   ├── controller/
+│   │   │   │   │   ├── AdminController.java
+│   │   │   │   │   ├── AuthController.java
+│   │   │   │   │   └── ItemController.java
+│   │   │   │   ├── dto/
+│   │   │   │   │   ├── AdminActionResponse.java
+│   │   │   │   │   ├── AdminCreateUserRequest.java
+│   │   │   │   │   ├── AdminStatsDto.java
+│   │   │   │   │   ├── AdminStatsResponse.java
+│   │   │   │   │   ├── AdminUpdateStatusRequest.java
+│   │   │   │   │   ├── AdminUpdateUserRequest.java
+│   │   │   │   │   ├── AdminUserDto.java
+│   │   │   │   │   ├── AdminUsersResponse.java
+│   │   │   │   │   ├── AuthResponse.java
+│   │   │   │   │   ├── ItemCreateRequest.java
+│   │   │   │   │   ├── ItemDto.java
+│   │   │   │   │   ├── ItemResponse.java
+│   │   │   │   │   ├── ItemUpdateRequest.java
+│   │   │   │   │   ├── LoginRequest.java
+│   │   │   │   │   ├── RegisterRequest.java
+│   │   │   │   │   └── UserDto.java
+│   │   │   │   ├── entity/
+│   │   │   │   │   ├── Item.java
+│   │   │   │   │   └── User.java
+│   │   │   │   ├── repository/
+│   │   │   │   │   ├── ItemRepository.java
+│   │   │   │   │   └── UserRepository.java
+│   │   │   │   └── service/
+│   │   │   │       ├── AdminService.java
+│   │   │   │       ├── AuthService.java
+│   │   │   │       └── ItemService.java
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/
+│   │       └── java/com/backtoyou/
+│   │           ├── BackendApplicationTests.java
+│   │           └── service/
+│   │               └── AdminServiceTest.java
+│   ├── pom.xml
+│   └── mvnw
+│
+├── frontend/
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── items.html
+│   ├── item-details.html
+│   ├── report-lost.html
+│   ├── report-found.html
+│   ├── my-reports.html
+│   ├── admin-dashboard.html
+│   ├── admin-users.html
+│   ├── admin-items.html
+│   ├── script.js
+│   └── style.css
 │
 ├── database/
 │   └── back_to_you.sql
 │
-├── php/
-│   ├── add-item.php
-│   ├── admin-get-users.php
-│   ├── admin-stats.php
-│   ├── db.php
-│   ├── delete-item.php
-│   ├── get-item.php
-│   ├── get-items.php
-│   ├── login.php
-│   ├── logout.php
-│   ├── register.php
-│   ├── session-check.php
-│   └── update-item.php
-│
-├── admin-dashboard.html
-├── admin-items.html
-├── admin-users.html
-├── dashboard.html
-├── index.html
-├── item-details.html
-├── items.html
-├── login.html
-├── my-reports.html
-├── register.html
-├── report-found.html
-├── report-lost.html
-├── script.js
-└── style.css
+├── README.md
+└── .gitignore
 ```
-
-### Purpose of Files & Folders
-- `database/back_to_you.sql`: Database schema definition containing table structures, foreign keys, and indexes.
-- `php/`: Server-side API endpoints for database connection, authentication, session management, item CRUD operations, and admin operations.
-- `*.html`: Structure for student pages (Home, Browse, Details, Dashboards, Reporting forms) and Admin management portals.
-- `script.js`: Client-side logic for DOM manipulation, form validation, dynamic fetch API requests, and event handling.
-- `style.css`: Unified CSS design system defining layout tokens, modern styling, and responsive layout styling.
 
 ---
 
-## Database
+## Features
 
-The application uses the MySQL database: **`back_to_you`**
+1. **User Registration & Login:** Self-service student registration with mandatory `@viva-technology.org` institutional email validation and secure authentication.
+2. **Session-Based Authentication:** Standard HTTP session management (`JSESSIONID`) via Spring Security with automatic session invalidation on logout.
+3. **Student & Admin Roles:** Server-enforced role separation (`STUDENT` vs. `ADMIN`) controlling access to application capabilities.
+4. **Report Lost Item:** Structured submission form capturing item title, category, campus location, date lost, description, and client-side photo previews.
+5. **Report Found Item:** Registration workflow for found items including designated campus custody handover checkpoints (e.g., Central Library, Lab Assistant, Security Gate).
+6. **Browse Lost & Found Listings:** Dynamic, responsive catalog displaying active items with visual status badges and metadata.
+7. **Search & Multi-Filter System:** Real-time client-side and server-side filtering by item type (`LOST` / `FOUND`), category, resolution status, and keywords.
+8. **Item Details View:** Dedicated detail page (`item-details.html?id=X`) presenting item information, custody status, and reporter contact options.
+9. **My Reports Dashboard:** Personalized dashboard allowing students to monitor the status of all their reported lost and found items.
+10. **Update & Delete Personal Reports:** Students can edit report descriptions or remove active listings they created.
+11. **Admin Dashboard:** Administrative portal displaying real-time metrics, breakdown counts, and platform-wide activity cards.
+12. **Admin User Management:** Administrative user directory with account creation, detail updates, and role configuration.
+13. **User Status Control:** Administrators can toggle accounts between `ACTIVE` and `INACTIVE` to suspend non-compliant users.
+14. **Admin Item Management:** Administrative oversight to review, edit, or purge any reported item across campus.
+15. **Mark Items Resolved:** Status transition from `ACTIVE` to `RESOLVED` when an item is safely returned to its rightful owner.
+16. **Role-Based Access Control (RBAC):** Strict security filters barring students from accessing admin APIs (`HTTP 403 Forbidden`).
+17. **Ownership-Based Mutation Control:** Item update and delete endpoints enforce that only the item author or an `ADMIN` can alter a listing.
+18. **MySQL Persistence:** Relational database storage handled through JPA entity models (`User` and `Item`) with Hibernate validation.
+19. **BCrypt Password Security:** Passwords hashed with BCrypt prior to database storage; plaintext passwords are never stored or logged.
+20. **Validation & Error Handling:** Comprehensive field validation and uniform JSON error structures across all REST endpoints.
 
-### Tables & Schema Architecture
+---
+
+## Security & Business Rules
+
+- **Public Access:** Unauthenticated users can freely view the home page, browse listings (`/api/items`), inspect item details (`/api/items/{id}`), and access login/registration pages.
+- **Protected Actions:** Creating reports, viewing personal dashboards, updating listings, or accessing administrative features requires an active session.
+- **Admin Isolation:** All `/api/admin/**` endpoints require `ROLE_ADMIN`. Any attempt by an unauthenticated user or student account yields `HTTP 403 Forbidden`.
+- **Ownership Verification:** Before modifying or deleting an item (`PUT /api/items/{id}`, `DELETE /api/items/{id}`), the service verifies that the authenticated user is the original creator or has administrative privileges.
+- **Self-Modification Restrictions:** Administrators cannot deactivate their own accounts or strip themselves of the `ADMIN` role.
+- **Last Administrator Safeguard:** The application prohibits deleting, deactivating, or demoting the last active administrator account to prevent administrative lockout.
+- **Referential Integrity on Deletion:** Users with associated lost or found reports cannot be deleted from the database; administrators must deactivate them instead.
+- **Deactivated Account Enforcement:** Users marked as `INACTIVE` cannot authenticate; login requests for inactive accounts are rejected by Spring Security.
+
+---
+
+## REST API Reference
+
+All API responses follow a uniform JSON structure: `{"success": true|false, ...}`.
+
+### Authentication Endpoints (`/api/auth`)
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Public | Register a new student account (`name`, `email`, `password`) |
+| `POST` | `/api/auth/login` | Public | Authenticate user credentials and establish session |
+| `GET` | `/api/auth/session-check` | Public | Check if the current client session is authenticated |
+| `POST` | `/api/auth/logout` | Authenticated | Terminate session and invalidate `JSESSIONID` |
+
+### Item Endpoints (`/api/items`)
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/items` | Public | Retrieve items with optional query parameters (`type`, `category`, `status`, `search`, `mine`) |
+| `GET` | `/api/items/{id}` | Public | Retrieve detailed information for a specific item |
+| `POST` | `/api/items` | Authenticated | Submit a new lost or found item report |
+| `GET` | `/api/items/my` | Authenticated | Retrieve all reports submitted by the authenticated user |
+| `PUT` | `/api/items/{id}` | Owner / Admin | Update title, description, category, location, date, or status (`RESOLVED`) |
+| `DELETE` | `/api/items/{id}` | Owner / Admin | Permanently delete an item report |
+
+### Admin Endpoints (`/api/admin`)
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/admin/users` | Admin Only | List all registered users (IDs, names, emails, roles, statuses) |
+| `GET` | `/api/admin/stats` | Admin Only | Retrieve system-wide metrics (total users, active/inactive counts, items by type/status) |
+| `POST` | `/api/admin/users` | Admin Only | Create a new user with specified role and status |
+| `PUT` | `/api/admin/users/{id}` | Admin Only | Update an existing user's name, email, role, status, or password |
+| `PATCH` | `/api/admin/users/{id}/status` | Admin Only | Toggle user account status between `ACTIVE` and `INACTIVE` |
+| `DELETE` | `/api/admin/users/{id}` | Admin Only | Delete an unlinked user account |
+
+---
+
+## Database Architecture
+
+The application connects to MySQL using the database: **`back_to_you`**.
+
+The database schema reference and seed structure are maintained in:
+```text
+database/back_to_you.sql
+```
+
+### Table Definitions
 
 1. **`users` Table**
    - `id`: INT AUTO_INCREMENT PRIMARY KEY
-   - `name`: VARCHAR(255)
-   - `email`: VARCHAR(255) UNIQUE
-   - `password`: VARCHAR(255) (Bcrypt hash)
+   - `name`: VARCHAR(255) NOT NULL
+   - `email`: VARCHAR(255) NOT NULL UNIQUE
+   - `password`: VARCHAR(255) NOT NULL (BCrypt hash)
    - `role`: ENUM('STUDENT', 'ADMIN') DEFAULT 'STUDENT'
+   - `status`: ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE'
    - `created_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 2. **`items` Table**
    - `id`: INT AUTO_INCREMENT PRIMARY KEY
-   - `user_id`: INT (Foreign Key referencing `users.id`)
-   - `title`: VARCHAR(255)
-   - `description`: TEXT
-   - `category`: VARCHAR(100)
-   - `location`: VARCHAR(255)
-   - `date`: DATE
-   - `type`: ENUM('LOST', 'FOUND')
-   - `image`: LONGTEXT / VARCHAR (Optional)
+   - `user_id`: INT NOT NULL (Foreign Key referencing `users.id`)
+   - `title`: VARCHAR(255) NOT NULL
+   - `description`: TEXT NOT NULL
+   - `category`: VARCHAR(100) NOT NULL
+   - `location`: VARCHAR(255) NOT NULL
+   - `date`: DATE NOT NULL
+   - `type`: ENUM('LOST', 'FOUND') NOT NULL
    - `status`: ENUM('ACTIVE', 'RESOLVED') DEFAULT 'ACTIVE'
+   - `image`: LONGTEXT (Optional base64 preview or image reference)
    - `created_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
-### Key Relationships & ENUM Definitions
-- **Foreign Key:** `items.user_id → users.id`
-- **User Roles:** `STUDENT` (default), `ADMIN` (elevated)
-- **Item Types:** `LOST`, `FOUND`
-- **Item Statuses:** `ACTIVE`, `RESOLVED`
-
 ---
 
-## Requirements
+## Local Development Setup
 
-- **Operating System:** macOS / Windows / Linux
-- **Web Server:** Apache 2.4+
-- **PHP Version:** PHP 8.x (Tested on PHP 8.5)
-- **Database Server:** MySQL 5.7+ / 8.0+
-- **Web Browser:** Modern browser (Chrome, Firefox, Safari, Edge)
-- **Editor:** VS Code (Recommended)
-- **Version Control:** Git (Optional)
+### Prerequisites
 
----
+- **Java Development Kit (JDK):** Version 21
+- **Database:** MySQL Server 5.7+ or 8.0+
+- **Build Tool:** Maven (Maven Wrapper `./mvnw` is included in the project)
+- **Version Control:** Git
 
-## Installation & Setup
+> **macOS (Apple Silicon) JDK Path:**
+> If installed via Homebrew, ensure your `JAVA_HOME` is pointed to:
+> ```bash
+> export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+> ```
 
 ### 1. Clone the Repository
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/avaniparab/Back-to-You---Campus-lost-and-found.git
 cd Back-to-You
 ```
 
-### 2. Configure Apache Web Server
-The project must be served through an Apache web server with PHP enabled. Do **not** open HTML files directly using `file://` or simple static HTTP servers (e.g. Python `http.server`).
+### 2. Configure the MySQL Database
 
-Example URL format:
-```text
-http://localhost:8080/
-```
-
-### 3. Create & Import the MySQL Database
-Log into your MySQL shell and create the database:
+Log in to MySQL and create the database:
 ```sql
 CREATE DATABASE back_to_you;
 ```
-Import the schema from `database/back_to_you.sql`:
+
+Import the database schema:
 ```bash
-mysql -u root back_to_you < database/back_to_you.sql
+mysql -u root -p back_to_you < database/back_to_you.sql
 ```
 
-### 4. Configure Database Connection Credentials
-Open `php/db.php` and update the database connection variables if your local MySQL configuration differs:
-```php
-$host = '127.0.0.1';
-$db   = 'back_to_you';
-$user = 'root';
-$pass = ''; // Enter your local MySQL password
+Configure your local database credentials in [backend/src/main/resources/application.properties](file:///Users/avaniparab/workflow/Back-to-You/backend/src/main/resources/application.properties):
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/back_to_you
+spring.datasource.username=root
+spring.datasource.password=your_mysql_password
 ```
 
-### 5. Start Apache & MySQL Services
-Commands vary depending on your operating system and service manager.
+### 3. Run Automated Tests
 
-**For macOS (Homebrew):**
+From the `backend` directory, run the test suite using the Maven Wrapper:
 ```bash
-brew services start httpd
-brew services start mysql
+cd backend
+JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./mvnw test
 ```
 
-**For Windows (XAMPP / WampServer):**
-Start Apache and MySQL modules through the Control Panel.
+### 4. Start the Application
 
-Navigate to `http://localhost:8080/` in your web browser.
+Start the Spring Boot development server:
+```bash
+JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./mvnw spring-boot:run
+```
 
-### 6. Create an Admin Account
-> **Note:** Public registration defaults strictly to `STUDENT` accounts for security.
+Once started, open your browser and navigate to:
+```text
+http://localhost:8081/
+```
 
-To create an administrator account, insert an admin user record directly into MySQL with an encrypted password hash generated via PHP's `password_hash()`:
+Spring Boot dynamically serves the frontend from `frontend/` on port `8081` while concurrently exposing the REST API at `http://localhost:8081/api/...`. No separate frontend server, Node.js process, or Apache web server is required.
 
-```sql
-INSERT INTO users (name, email, password, role) 
-VALUES ('System Administrator', 'admin@viva-technology.org', '<PASSWORD_HASH>', 'ADMIN');
+---
+
+## Deployment on Apache Tomcat
+
+The application supports standard Java Web Application Archive (WAR) packaging for production deployment to an external **Apache Tomcat** Servlet container.
+
+### Deployment Architecture
+
+```text
+Browser (Client)
+   │
+   │  HTTP / HTTPS
+   ▼
+Apache Tomcat (Servlet Container)
+   │
+   ▼
+Spring Boot WAR (Back-to-You)
+   ├── Spring MVC DispatcherServlet
+   ├── WebConfig Static Resource Handlers
+   └── Service & Security Layer
+         │
+         ▼
+      MySQL Database (back_to_you)
+```
+
+### Packaging & Deployment Steps
+
+1. **Build the WAR Package:**
+   From the `backend` directory, compile and package the application:
+   ```bash
+   JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./mvnw clean package
+   ```
+
+2. **Locate the Build Artifact:**
+   Maven outputs the compiled artifact inside:
+   ```text
+   backend/target/backend-0.0.1-SNAPSHOT.war
+   ```
+   *(or the configured archive name)*
+
+3. **Deploy to Apache Tomcat:**
+   Copy the generated `.war` file into your Tomcat installation's `webapps/` directory:
+   ```bash
+   cp backend/target/backend-0.0.1-SNAPSHOT.war /path/to/tomcat/webapps/back-to-you.war
+   ```
+
+4. **Start the Servlet Container:**
+   Start Apache Tomcat:
+   ```bash
+   /path/to/tomcat/bin/startup.sh
+   ```
+   Tomcat automatically explodes and deploys the WAR archive. The application will be accessible via Tomcat's configured HTTP port (e.g., `http://localhost:8080/back-to-you/`).
+
+---
+
+## Automated Testing
+
+Automated testing is implemented using **Spring Boot Test**, **JUnit 5**, and **Mockito**:
+
+- **Context Verification (`BackendApplicationTests`):** Verifies that the Spring application context, JPA entity manager, security filter chains, and database connectivity load cleanly.
+- **Service & Business Rule Tests (`AdminServiceTest`):** Comprehensive unit tests verifying administrative operations, role modifications, account status transitions, self-edit protections, and safeguards preventing modification of the sole remaining administrator.
+
+### Current Test Suite Metrics
+
+```text
+Tests run: 16
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
+```
+
+Run tests locally at any time via:
+```bash
+cd backend
+./mvnw test
 ```
 
 ---
 
-## Authentication & Security
+## User Interface & Design
 
-- **Password Hashing:** Passwords are securely hashed using PHP `password_hash()` with default strong algorithm (Bcrypt).
-- **Password Verification:** Authentication uses `password_verify()` against stored hashes.
-- **Session Management:** PHP sessions (`$_SESSION`) manage user authorization state.
-- **Session Fixation Prevention:** Session IDs are regenerated upon successful login.
-- **SQL Injection Prevention:** All SQL queries execute through PDO prepared statements with parameter binding.
-- **Role-Based Access Control (RBAC):** Admin endpoints (`php/admin-stats.php`, `php/admin-get-users.php`) strictly enforce `$_SESSION['role'] === 'ADMIN'`.
-- **Ownership Verification:** Item update and delete operations verify that `user_id` matches `$_SESSION['user_id']` or `$_SESSION['role'] === 'ADMIN'`.
-- **API Payload Security:** Password hashes are excluded from all JSON API responses.
+The frontend implements a modern **Glassmorphism** aesthetic built with vanilla CSS tokens:
+- **Translucent Surfaces:** Backdrops styled with blurred reflections and semi-transparent panels.
+- **Harmonious Palette:** Slate blue, deep navy, and teal accents with high contrast for accessibility.
+- **Responsive Navigation:** Adaptable hamburger menus, mobile drawer overlays, and responsive grid layouts.
+- **Interactive Feedback:** Micro-animations on interactive cards, animated status badges, modal confirmations, and dynamic toast notifications.
 
 ---
 
-## API / PHP Endpoints
+## Academic Context & License
 
-| Endpoint | Method | Purpose | Authentication |
-| :--- | :--- | :--- | :--- |
-| `php/register.php` | `POST` | Register a new student user | Public |
-| `php/login.php` | `POST` | Authenticate user & start session | Public |
-| `php/logout.php` | `GET` | Destroy current server session | Public / User |
-| `php/session-check.php` | `GET` | Check logged-in user state & role | Public |
-| `php/add-item.php` | `POST` | Submit a new LOST or FOUND report | Student / Admin |
-| `php/get-items.php` | `GET` | Fetch items with filtering & search | Public |
-| `php/get-item.php` | `GET` | Fetch specific item details by ID | Public |
-| `php/update-item.php` | `POST` | Update item status (`RESOLVED`) | Owner / Admin |
-| `php/delete-item.php` | `POST` | Delete an item report | Owner / Admin |
-| `php/admin-get-users.php` | `GET` | Retrieve user directory | Admin Only |
-| `php/admin-stats.php` | `GET` | Fetch overall database statistics | Admin Only |
+This project was developed as an academic web application to demonstrate full-stack engineering principles, including database schema design, RESTful API architecture, role-based access control, session management, and micro-service packaging.
 
----
-
-## Running the Project
-
-1. Start your local Apache web server.
-2. Start your MySQL database server.
-3. Verify `back_to_you` database is created and imported.
-4. Open `http://localhost:8080/` in your browser.
-5. Register a new student account using an `@viva-technology.org` email address.
-6. Log in to access student reporting features.
-7. Test submitting, browsing, filtering, and resolving reports.
-8. Log in with an admin account to test the administrative dashboard and user management.
-
----
-
-## Testing Checklist
-
-### Student Verification
-- [ ] Student Registration (`@viva-technology.org`)
-- [ ] Student Login
-- [ ] Student Logout
-- [ ] Report Lost Item
-- [ ] Report Found Item
-- [ ] Browse Reported Items
-- [ ] Keyword Search
-- [ ] Category & Type Filters
-- [ ] View Item Details Page
-- [ ] View Personal Reports (`my-reports.html`)
-- [ ] Mark Item as Resolved
-
-### Admin Verification
-- [ ] Admin Login
-- [ ] Access Protected Admin Dashboard
-- [ ] View System Statistics
-- [ ] View User Directory (`admin-users.html`)
-- [ ] View All Items Directory (`admin-items.html`)
-- [ ] Perform Administrative Item Management
-- [ ] Verify Student Access Blocked on Admin APIs (`HTTP 403`)
-- [ ] Admin Logout
-
----
-
-## Current Limitations
-
-- **Image Previews:** Item image attachment currently uses client-side file previewing and is not permanently saved to server file storage.
-- **Reporter Contacting:** Contacting a reporter triggers standard `mailto:` actions using the reporter's verified email.
-- **Notifications:** No automated SMS or OTP email service.
-- **Messaging:** Direct messaging between users is not currently built into the application.
-- **Item Matching:** No automated AI matching algorithm between lost and found items.
-- **Mapping:** No geolocation or Interactive Campus Map integration.
-
----
-
-## Future Enhancements
-
-- Server-side persistent file storage for item photos.
-- Automated email notifications on item status updates.
-- OTP verification during student registration.
-- Automated AI matching between lost and found report attributes.
-- Interactive campus map integration for drop-off and lost locations.
-- In-app real-time messaging between item owner and finder.
-- Dedicated mobile application version.
-
----
-
-## Project Purpose
-
-This project was developed as a college Web Designing mini-project to demonstrate practical full-stack application development principles, including HTML5 layout, CSS3 styling, Vanilla JavaScript DOM integration, PHP server-side scripting, PDO database interactions, MySQL query execution, session security, and role-based access control.
-
----
-
-## License
-
-This project was developed as an academic/educational project.
-
----
-
-## Author
-
-- **Developed by:** [Your Name]
-- **College:** [Your College Name]
-- **Academic Project:** Web Designing
+- **Author:** Avani Parab
+- **Institution:** Viva Institute of Technology
+- **Academic Project:** Web Designing / Full-Stack Development
+- **License:** Educational / Academic Use
