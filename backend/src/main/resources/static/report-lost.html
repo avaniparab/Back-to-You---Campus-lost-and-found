@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Lost Item — Back to You</title>
+  <meta name="description" content="Report a lost item on campus to notify students, faculty, and campus security.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Student Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand">
+          <div class="brand-icon" style="background-color: var(--accent); border-color: var(--accent-hover);">↺</div>
+          <div class="brand-text">
+            <span class="brand-title">BACK TO YOU</span>
+            <span class="brand-subtitle">Student Portal</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">AP</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name">Avani Parab</span>
+          <span class="sidebar-user-role">Student · CE Dept</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="dashboard.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="7" height="9" x="3" y="3" rx="1"/>
+              <rect width="7" height="5" x="14" y="3" rx="1"/>
+              <rect width="7" height="9" x="14" y="12" rx="1"/>
+              <rect width="7" height="5" x="3" y="16" rx="1"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="report-lost.html" class="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" x2="12" y1="8" y2="16"/>
+              <line x1="8" x2="16" y1="12" y2="12"/>
+            </svg>
+            <span>Report Lost</span>
+          </a>
+        </li>
+        <li>
+          <a href="report-found.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m9 11 3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+            <span>Report Found</span>
+          </a>
+        </li>
+        <li>
+          <a href="my-reports.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+              <line x1="16" x2="8" y1="13" y2="13"/>
+              <line x1="16" x2="8" y1="17" y2="17"/>
+              <line x1="10" x2="8" y1="9" y2="9"/>
+            </svg>
+            <span>My Reports</span>
+          </a>
+        </li>
+        <li>
+          <a href="items.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <span>Browse Items</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <ul class="sidebar-nav" style="padding: 0;">
+          <li>
+            <a href="index.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              </svg>
+              <span>Public Site</span>
+            </a>
+          </li>
+          <li>
+            <a href="login.html" style="color: #F87171;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" x2="9" y1="12" y2="12"/>
+              </svg>
+              <span>Logout</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="content-topbar">
+        <div class="breadcrumb" style="margin-bottom: 0;">
+          <a href="dashboard.html">Dashboard</a>
+          <span>/</span>
+          <span style="color: var(--text-dark); font-weight: 600;">Report Lost Item</span>
+        </div>
+        <div>
+          <a href="dashboard.html" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+        </div>
+      </header>
+
+      <div class="content-area">
+        <div class="form-container">
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span class="badge badge-lost">Lost Property</span>
+              <span class="text-muted" style="font-size: 0.85rem;">Step 1 of 1</span>
+            </div>
+            <h1 style="font-size: 1.85rem; color: var(--text-dark); margin-bottom: 0.35rem;">
+              Report a Lost Item
+            </h1>
+            <p class="text-muted" style="margin: 0;">
+              Provide clear and accurate details so campus peers and security desks can identify your belongings.
+            </p>
+          </div>
+
+          <!-- Helpful Instructions Box -->
+          <div class="form-instructions-box">
+            <strong style="display: block; margin-bottom: 0.25rem;">Tips for a successful recovery:</strong>
+            <ul style="padding-left: 1.25rem; font-size: 0.85rem; line-height: 1.5;">
+              <li>Mention distinct markers like stickers, scratches, colors, or engraved initials.</li>
+              <li>Specify the approximate time and classroom, lab room, or table number.</li>
+              <li>Upload a clear photo if you have one from before it was misplaced.</li>
+            </ul>
+          </div>
+
+          <!-- Visual Form -->
+          <form action="my-reports.html" method="get">
+            <div class="form-group">
+              <label for="lost-item-name" class="form-label">
+                Item Name <span style="color: var(--accent);">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="lost-item-name" 
+                name="item_name" 
+                class="form-control" 
+                placeholder="e.g. Blue Hydro Flask 32oz Water Bottle" 
+                required
+              >
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="lost-category" class="form-label">
+                  Category <span style="color: var(--accent);">*</span>
+                </label>
+                <select id="lost-category" name="category" class="form-control" required>
+                  <option value="" disabled selected>Select Item Category</option>
+                  <option value="electronics">Electronics (Phones, Chargers, Laptops, Earbuds)</option>
+                  <option value="documents">Documents (ID Cards, Passports, Envelopes)</option>
+                  <option value="accessories">Accessories (Bottles, Wallets, Keys, Glasses)</option>
+                  <option value="books">Books &amp; Notebooks</option>
+                  <option value="clothing">Clothing &amp; Umbrellas</option>
+                  <option value="stationery">Stationery (Calculators, Pouches)</option>
+                  <option value="others">Others</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="lost-date" class="form-label">
+                  Date Lost <span style="color: var(--accent);">*</span>
+                </label>
+                <input 
+                  type="date" 
+                  id="lost-date" 
+                  name="date_lost" 
+                  class="form-control" 
+                  value="2026-10-04" 
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="lost-location" class="form-label">
+                Location Last Seen <span style="color: var(--accent);">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="lost-location" 
+                name="location" 
+                class="form-control" 
+                placeholder="e.g. Central Library 1st Floor quiet study area, table by window" 
+                required
+              >
+              <div class="form-help">Include building name, floor, and nearby landmarks or room numbers.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="lost-description" class="form-label">
+                Detailed Description <span style="color: var(--accent);">*</span>
+              </label>
+              <textarea 
+                id="lost-description" 
+                name="description" 
+                class="form-control" 
+                placeholder="Describe brand, color, stickers, scratches, contents, or serial numbers..." 
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Upload Item Photo (Optional)</label>
+              <div class="file-drop-zone">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="9" cy="9" r="2"/>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-bottom: 0.25rem;">
+                  Click or drag photo here
+                </div>
+                <div class="text-muted" style="font-size: 0.8rem;">Supports JPG, PNG up to 5MB</div>
+                <input type="file" id="lost-image" name="image" style="display: none;">
+              </div>
+            </div>
+
+            <div class="form-actions-row">
+              <a href="dashboard.html" class="btn btn-secondary">&larr; Cancel &amp; Return</a>
+              <button type="submit" class="btn btn-accent btn-lg">Submit Lost Report</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
